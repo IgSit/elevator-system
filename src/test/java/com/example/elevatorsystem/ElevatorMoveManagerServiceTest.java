@@ -35,6 +35,8 @@ class ElevatorMoveManagerServiceTest {
         Elevator otherElevator = new Elevator();
         otherElevator.setCurrentMove(1);
 
+        ElevatorMove passingMove = new ElevatorMove(6, 0);
+
         ElevatorMoveCalculatorHelper helper = new ElevatorMoveCalculatorHelper(0, passingElevator,
                                                                                   0, Flag.CHANGE_CURRENT_MOVE);
 
@@ -43,7 +45,7 @@ class ElevatorMoveManagerServiceTest {
         elevatorMoveManagerService.addNewElevatorMove(pendingFloor);
 
         assertEquals(passingElevator.getCurrentMove(), 5);
-        assertEquals(passingElevator.getPlannedMoves(), List.of(6));
+        assertEquals(passingElevator.getPlannedMoves(), List.of(passingMove));
 
         assertEquals(otherElevator.getCurrentMove(), 1);
         assertEquals(otherElevator.getPlannedMoves(), List.of());

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ElevatorService {
@@ -13,6 +14,10 @@ public class ElevatorService {
     @Autowired
     public ElevatorService(ElevatorRepository elevatorRepository) {
         this.elevatorRepository = elevatorRepository;
+    }
+
+    public Optional<Elevator> findElevatorById(Long id) {
+        return elevatorRepository.findById(id);
     }
 
     public List<Elevator> getElevators() {

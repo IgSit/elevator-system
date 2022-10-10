@@ -19,17 +19,23 @@ public class ElevatorMoveManagerService {
     public void addNewElevatorMove(int pendingFloor) {
         ElevatorMoveCalculatorHelper helper = moveCalculatorService.findOptimalElevator(pendingFloor);
         if (helper.flag() != Flag.ADD_TO_PLANNED_MOVES) addAsCurrentDestination(helper, pendingFloor, helper.flag());
-        else addToPlannedMoves(helper, pendingFloor);
+        else {
+            ElevatorMove move = new ElevatorMove(pendingFloor, helper.index());
+            addToPlannedMoves(helper, move);
+        }
     }
 
     private void addAsCurrentDestination(ElevatorMoveCalculatorHelper helper, int pendingFloor, Flag flag) {
         Elevator elevator = helper.elevator();
-        if (flag == Flag.CHANGE_CURRENT_MOVE) elevator.addMove(elevator.getCurrentMove(), 0);
+        if (flag == Flag.CHANGE_CURRENT_MOVE) {
+            ElevatorMove move = new ElevatorMove();
+            elevator.addMove(move);
+        }
         elevator.setCurrentMove(pendingFloor);
     }
 
-    private void addToPlannedMoves(ElevatorMoveCalculatorHelper helper, int pendingFloor) {
+    private void addToPlannedMoves(ElevatorMoveCalculatorHelper helper, ElevatorMove move) {
         Elevator elevator = helper.elevator();
-        elevator.addMove(pendingFloor, helper.index());
+        elevator.addMove(move);
     }
 }

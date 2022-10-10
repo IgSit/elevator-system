@@ -57,13 +57,13 @@ public class ElevatorMoveCalculatorService {
     private ElevatorMoveCalculatorHelper findResultInPlannedRows(ElevatorMoveCalculatorHelper result,
                                                                  Elevator elevator,
                                                                  int pendingFloor) {
-        List<Integer> plannedMoves = elevator.getPlannedMoves();
+        List<ElevatorMove> plannedMoves = elevator.getPlannedMoves().stream().toList();
         int reachTime = Math.abs(pendingFloor - elevator.getCurrentFloor());
 
         int nextFloor = elevator.getCurrentMove();
         for (int i = 0; i < plannedMoves.size(); i++) {
             int currentFloor = nextFloor;
-            nextFloor = plannedMoves.get(i);
+            nextFloor = plannedMoves.get(i).getFloor();
             int currentMoveChange = calculateCurrentMoveChange(currentFloor, nextFloor, pendingFloor);
             int futureMovesChange = calculateFutureMovesChange(elevator.getPlannedMoves().size(), currentMoveChange);
             reachTime += Math.abs(nextFloor - currentFloor);

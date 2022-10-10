@@ -74,15 +74,22 @@ class ElevatorMoveCalculatorServiceTest {
         Elevator passingElevator = new Elevator();
         passingElevator.setCurrentMove(3);
 
-        passingElevator.addMove(5, 0);
-        passingElevator.addMove(2, 1);
-        passingElevator.addMove(8, 2);  // time to reach floor 7: 5 + 3 + 5 = 13
+        ElevatorMove passingMove1 = new ElevatorMove(5, 0);
+        ElevatorMove passingMove2 = new ElevatorMove(2, 1);
+        ElevatorMove passingMove3 = new ElevatorMove(8, 2);
+
+        passingElevator.addMove(passingMove1);
+        passingElevator.addMove(passingMove2);
+        passingElevator.addMove(passingMove3);  // time to reach floor 7: 5 + 3 + 5 = 13
 
         Elevator earlyFinishedElevator = new Elevator();
         earlyFinishedElevator.setCurrentMove(2);
 
-        earlyFinishedElevator.addMove(4, 0);
-        earlyFinishedElevator.addMove(6, 1);  // time to reach floor 7: 4 + 2 + 1 = 7
+        ElevatorMove earlyMove1 = new ElevatorMove(4, 0);
+        ElevatorMove earlyMove2 = new ElevatorMove(6, 1);
+
+        earlyFinishedElevator.addMove(earlyMove1);
+        earlyFinishedElevator.addMove(earlyMove2);  // time to reach floor 7: 4 + 2 + 1 = 7
 
         List<Elevator> elevators = List.of(earlyFinishedElevator, passingElevator);
 

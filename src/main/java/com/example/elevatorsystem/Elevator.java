@@ -1,8 +1,8 @@
 package com.example.elevatorsystem;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "elevators")
@@ -12,7 +12,6 @@ public class Elevator {
             name = "elevator_sequence",
             sequenceName = "elevator_sequence",
             allocationSize = 1
-
     )
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
@@ -21,13 +20,13 @@ public class Elevator {
     private Long id;
     private int currentFloor;
     private int currentMove;
-    @Transient
-    private final List<Integer> plannedMoves;
+    @OneToMany(mappedBy = "elevator")
+    private final Set<ElevatorMove> plannedMoves;
 
     public Elevator() {
         currentFloor = 0;
         currentMove = -1;
-        plannedMoves = new ArrayList<>() {
+        plannedMoves = new HashSet<>() {
         };
     }
 
@@ -39,9 +38,9 @@ public class Elevator {
         if (shouldFinishCurrentMove()) finishCurrentMove();
     }
 
-    public void addMove(int move, int index) {
-        if (isFree()) currentMove = move;
-        else plannedMoves.add(index, move);
+    public void addMove(ElevatorMove move) {
+        if (isFree()) currentMove = move.getFloor();
+        else plannedMoves.add(move);
     }
 
     public boolean isBusy() {
@@ -78,7 +77,7 @@ public class Elevator {
         this.currentMove = currentMove;
     }
 
-    public List<Integer> getPlannedMoves() {
+    public Set<ElevatorMove> getPlannedMoves() {
         return plannedMoves;
     }
 
@@ -97,6 +96,5 @@ public class Elevator {
 
     private void finishCurrentMove() {
         if (plannedMoves.isEmpty()) currentMove = -1;
-        else currentMove = plannedMoves.remove(0);
     }
 }

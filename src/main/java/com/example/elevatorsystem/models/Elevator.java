@@ -1,10 +1,10 @@
 package com.example.elevatorsystem.models;
 
+import com.example.elevatorsystem.services.ElevatorMoveManagerService;
 import com.example.elevatorsystem.services.ElevatorMoveService;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "elevators")
@@ -23,26 +23,29 @@ public class Elevator {
     private int currentFloor;
     private int currentMove;
     @OneToMany(mappedBy = "elevator")
-    private final Set<ElevatorMove> plannedMoves;
+    private final List<ElevatorMove> plannedMoves;
 
     public Elevator() {
         currentFloor = 0;
         currentMove = -1;
-        plannedMoves = new HashSet<>() {
+        plannedMoves = new ArrayList<>() {
         };
     }
 
-    public void step() {
+    public void step(ElevatorMoveManagerService moveManagerService) {
         if (isFree()) return;
         if (isGoingUp()) currentFloor++;
         else currentFloor--;
 
-        if (shouldFinishCurrentMove()) finishCurrentMove();
+        if (shouldFinishCurrentMove()) finishCurrentMove(moveManagerService);
     }
 
     public void addMove(ElevatorMove move, ElevatorMoveService moveService) {
         if (isFree()) currentMove = move.getFloor();
-        else moveService.addElevatorMove(move);
+        else {
+            moveService.updateFutureElevatorMoves(this.id, move.getIndex(), 1);
+            moveService.addElevatorMove(move);
+        }
     }
 
     public boolean isBusy() {
@@ -83,7 +86,7 @@ public class Elevator {
         this.currentMove = currentMove;
     }
 
-    public Set<ElevatorMove> getPlannedMoves() {
+    public List<ElevatorMove> getPlannedMoves() {
         return plannedMoves;
     }
 
@@ -93,7 +96,8 @@ public class Elevator {
                 "id=" + id +
                 ", currentFloor=" + currentFloor +
                 ", currentMove=" + currentMove +
-                ", plannedMoves=" + plannedMoves.stream().map(ElevatorMove::getFloor).toList() +
+                ", plannedMoves=" + plannedMoves.stream().sorted(Comparator.comparingInt(ElevatorMove::getIndex))
+                                    .map(ElevatorMove::getFloor).toList() +
                 '}';
     }
 
@@ -110,7 +114,10 @@ public class Elevator {
         return currentFloor == currentMove;
     }
 
-    private void finishCurrentMove() {
+    private void finishCurrentMove(ElevatorMoveManagerService moveManagerService) {
         if (plannedMoves.isEmpty()) currentMove = -1;
+        else {
+            currentMove = moveManagerService.popFirstMove(this.id).getFloor();
+        }
     }
 }

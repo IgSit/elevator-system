@@ -10,14 +10,16 @@ import javax.transaction.Transactional;
 public class StepService {
 
     private final ElevatorService elevatorService;
+    private final ElevatorMoveManagerService moveManagerService;
 
     @Autowired
-    public StepService(ElevatorService elevatorService) {
+    public StepService(ElevatorService elevatorService, ElevatorMoveManagerService moveManagerService) {
         this.elevatorService = elevatorService;
+        this.moveManagerService = moveManagerService;
     }
 
     @Transactional
     public void runStep() {
-        elevatorService.getElevators().forEach(Elevator::step);
+        elevatorService.getElevators().forEach(e -> e.step(moveManagerService));
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class ElevatorMoveService {
@@ -21,7 +22,21 @@ public class ElevatorMoveService {
         moveRepository.save(move);
     }
 
-    public List<ElevatorMove> getElevatorMoves() {
-        return moveRepository.findAll();
+    public List<ElevatorMove> getElevatorMovesByElevatorId(Long elevatorId) {
+        return moveRepository.getElevatorMovesByElevatorId(elevatorId);
+    }
+
+    public ElevatorMove getElevatorMoveAtIndex(Long elevatorId, int index) {
+        return moveRepository.getElevatorMovesByElevatorId(elevatorId).get(index);
+    }
+
+    public void removeElevatorMoveAtIndex(Long elevatorId, int index) {
+        moveRepository.removeElevatorMoveAtIndex(elevatorId, index);
+    }
+
+    public void updateFutureElevatorMoves(Long elevatorId, int startingIndex, int value) {
+        Stream<ElevatorMove> futureElevatorMoves = getElevatorMovesByElevatorId(elevatorId)
+                .stream().filter(em -> em.getIndex() >= startingIndex);
+        futureElevatorMoves.forEach(em -> em.setIndex(em.getIndex() + value));
     }
 }

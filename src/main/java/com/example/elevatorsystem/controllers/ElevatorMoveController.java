@@ -1,27 +1,24 @@
 package com.example.elevatorsystem.controllers;
 
 import com.example.elevatorsystem.services.ElevatorMoveManagerService;
-import com.example.elevatorsystem.services.ElevatorService;
-import com.example.elevatorsystem.models.Elevator;
+import com.example.elevatorsystem.services.ElevatorMoveService;
 import com.example.elevatorsystem.models.ElevatorMove;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("elevator-moves")
 public class ElevatorMoveController {
 
     private final ElevatorMoveManagerService moveManagerService;
-    private final ElevatorService elevatorService;
+    private final ElevatorMoveService elevatorMoveService;
 
     @Autowired
-    public ElevatorMoveController(ElevatorMoveManagerService moveManagerService,
-                                  ElevatorService elevatorService) {
+    public ElevatorMoveController(ElevatorMoveManagerService moveManagerService, ElevatorMoveService elevatorMoveService) {
         this.moveManagerService = moveManagerService;
-        this.elevatorService = elevatorService;
+        this.elevatorMoveService = elevatorMoveService;
     }
 
     @PostMapping
@@ -30,9 +27,8 @@ public class ElevatorMoveController {
     }
 
     @GetMapping
-    public List<String> getElevatorMoves(@RequestParam Long elevator_id) {
-        Optional<Elevator> elevator = elevatorService.findElevatorById(elevator_id);
-        if (elevator.isEmpty()) throw new IllegalArgumentException("Elevator does not exist");
-        return elevator.get().getPlannedMoves().stream().map(ElevatorMove::toString).toList();
+    public List<String> getElevatorMovesByElevatorId(@RequestParam Long elevator_id) {
+        return elevatorMoveService.getElevatorMovesByElevatorId(elevator_id)
+                .stream().map(ElevatorMove::toString).toList();
     }
 }

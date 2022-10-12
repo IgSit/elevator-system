@@ -31,10 +31,23 @@ public class ElevatorMoveManagerService {
         }
     }
 
+    @Transactional
+    public ElevatorMove popFirstMove(Long elevatorId) {
+        ElevatorMove firstMove = moveService.getElevatorMoveAtIndex(elevatorId, 0);
+        removeFirstMove(elevatorId);
+        return firstMove;
+    }
+
+
+    private void removeFirstMove(Long elevatorId) {
+        moveService.removeElevatorMoveAtIndex(elevatorId, 0);
+        moveService.updateFutureElevatorMoves(elevatorId, 1, -1);
+    }
+
     private void addAsCurrentDestination(ElevatorMoveCalculatorHelper helper, int pendingFloor, Flag flag) {
         Elevator elevator = helper.elevator();
         if (flag == Flag.CHANGE_CURRENT_MOVE) {
-            ElevatorMove move = new ElevatorMove(elevator.getCurrentFloor(), 0, helper.elevator());
+            ElevatorMove move = new ElevatorMove(elevator.getCurrentMove(), 0, helper.elevator());
             elevator.addMove(move, moveService);
         }
         elevator.setCurrentMove(pendingFloor);

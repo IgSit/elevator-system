@@ -1,5 +1,6 @@
-package com.example.elevatorsystem;
+package com.example.elevatorsystem.controllers;
 
+import com.example.elevatorsystem.services.StepService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

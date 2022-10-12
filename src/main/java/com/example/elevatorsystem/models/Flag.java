@@ -1,4 +1,4 @@
-package com.example.elevatorsystem;
+package com.example.elevatorsystem.models;
 
 public enum Flag {
     ADD_TO_PLANNED_MOVES,

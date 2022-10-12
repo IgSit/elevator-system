@@ -1,5 +1,7 @@
-package com.example.elevatorsystem;
+package com.example.elevatorsystem.services;
 
+import com.example.elevatorsystem.models.Elevator;
+import com.example.elevatorsystem.repositories.ElevatorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

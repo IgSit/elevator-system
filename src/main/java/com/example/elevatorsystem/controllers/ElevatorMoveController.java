@@ -1,10 +1,14 @@
-package com.example.elevatorsystem;
+package com.example.elevatorsystem.controllers;
 
+import com.example.elevatorsystem.services.ElevatorMoveManagerService;
+import com.example.elevatorsystem.services.ElevatorService;
+import com.example.elevatorsystem.models.Elevator;
+import com.example.elevatorsystem.models.ElevatorMove;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @RestController
 @RequestMapping("elevator-moves")
@@ -26,9 +30,9 @@ public class ElevatorMoveController {
     }
 
     @GetMapping
-    public Set<ElevatorMove> getElevatorMoves(@RequestParam Long elevator_id) {
+    public List<String> getElevatorMoves(@RequestParam Long elevator_id) {
         Optional<Elevator> elevator = elevatorService.findElevatorById(elevator_id);
         if (elevator.isEmpty()) throw new IllegalArgumentException("Elevator does not exist");
-        return elevator.get().getPlannedMoves();
+        return elevator.get().getPlannedMoves().stream().map(ElevatorMove::toString).toList();
     }
 }

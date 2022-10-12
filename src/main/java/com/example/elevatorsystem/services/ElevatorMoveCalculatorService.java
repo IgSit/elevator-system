@@ -1,5 +1,9 @@
-package com.example.elevatorsystem;
+package com.example.elevatorsystem.services;
 
+import com.example.elevatorsystem.models.Elevator;
+import com.example.elevatorsystem.models.ElevatorMove;
+import com.example.elevatorsystem.models.ElevatorMoveCalculatorHelper;
+import com.example.elevatorsystem.models.Flag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

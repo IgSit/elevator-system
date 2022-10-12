@@ -1,4 +1,6 @@
-package com.example.elevatorsystem;
+package com.example.elevatorsystem.models;
+
+import com.example.elevatorsystem.services.ElevatorMoveService;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -38,9 +40,9 @@ public class Elevator {
         if (shouldFinishCurrentMove()) finishCurrentMove();
     }
 
-    public void addMove(ElevatorMove move) {
+    public void addMove(ElevatorMove move, ElevatorMoveService moveService) {
         if (isFree()) currentMove = move.getFloor();
-        else plannedMoves.add(move);
+        else moveService.addElevatorMove(move);
     }
 
     public boolean isBusy() {
@@ -61,6 +63,10 @@ public class Elevator {
         return !hasSameDirection(pendingFloor);
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public int getCurrentFloor() {
         return currentFloor;
     }
@@ -79,6 +85,16 @@ public class Elevator {
 
     public Set<ElevatorMove> getPlannedMoves() {
         return plannedMoves;
+    }
+
+    @Override
+    public String toString() {
+        return "Elevator{" +
+                "id=" + id +
+                ", currentFloor=" + currentFloor +
+                ", currentMove=" + currentMove +
+                ", plannedMoves=" + plannedMoves.stream().map(ElevatorMove::getFloor).toList() +
+                '}';
     }
 
     private boolean isGoingUp() {

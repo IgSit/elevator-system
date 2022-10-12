@@ -1,4 +1,4 @@
-package com.example.elevatorsystem;
+package com.example.elevatorsystem.models;
 
 import javax.persistence.*;
 
@@ -21,12 +21,13 @@ public class ElevatorMove {
     private Elevator elevator;
     @Column(name = "floor", nullable = false)
     private int floor;
-    @Column(name = "indexOrder", nullable = false)
+    @Column(name = "index_order", nullable = false)
     private int indexOrder;
 
-    public ElevatorMove(int floor, int indexOrder) {
+    public ElevatorMove(int floor, int indexOrder, Elevator elevator) {
         this.floor = floor;
         this.indexOrder = indexOrder;
+        this.elevator = elevator;
     }
 
     public ElevatorMove() {
@@ -40,7 +41,21 @@ public class ElevatorMove {
         return indexOrder;
     }
 
+    public Elevator getElevator() {
+        return elevator;
+    }
+
     public void setIndex(int index) {
         this.indexOrder = index;
+    }
+
+    @Override
+    public String toString() {
+        return "ElevatorMove{" +
+                "id=" + id +
+                ", elevatorID=" + elevator.getId() +
+                ", floor=" + floor +
+                ", indexOrder=" + indexOrder +
+                '}';
     }
 }

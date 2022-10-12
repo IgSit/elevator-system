@@ -23,7 +23,7 @@ public class Elevator {
     private int currentFloor;
     private int currentMove;
     @OneToMany(mappedBy = "elevator")
-    private final List<ElevatorMove> plannedMoves;
+    private List<ElevatorMove> plannedMoves;
 
     public Elevator() {
         currentFloor = 0;
@@ -88,6 +88,10 @@ public class Elevator {
 
     public List<ElevatorMove> getPlannedMoves() {
         return plannedMoves;
+    }
+
+    public void setPlannedMoves(List<ElevatorMove> plannedMoves) {
+        this.plannedMoves = plannedMoves;
     }
 
     @Override

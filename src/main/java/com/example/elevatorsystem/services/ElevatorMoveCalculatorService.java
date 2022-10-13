@@ -55,17 +55,12 @@ public class ElevatorMoveCalculatorService {
         if (elevator.getPlannedMoves().isEmpty()) return null;
         int movesSize = elevator.getPlannedMoves().size();
         int differenceAsFirstMove = calculateMoveImpact(elevator.getCurrentFloor(), elevator.getCurrentMove(), pendingFloor) * calculateFutureMovesImpact(movesSize);
-        System.out.println("Planned");
-        System.out.println(elevator.getId());
-        System.out.println(differenceAsFirstMove);
         ElevatorMoveCalculatorHelper result = new ElevatorMoveCalculatorHelper(differenceAsFirstMove, elevator, 0, Flag.ADD_TO_PLANNED_MOVES);
         List<ElevatorMove> moves = elevator.getPlannedMoves();
         for (int i = 1; i < moves.size(); i++) {
             int moveDifference = calculateMoveImpact(moves.get(i - 1).getFloor(), moves.get(i).getFloor(), pendingFloor);
             int futureMovesSize = movesSize - i;
             moveDifference += moveDifference * calculateFutureMovesImpact(futureMovesSize);
-            System.out.println(i);
-            System.out.println(moveDifference);
             if (moveDifference < result.difference())
                 result = new ElevatorMoveCalculatorHelper(moveDifference, elevator, i, Flag.ADD_TO_PLANNED_MOVES);
         }
@@ -77,7 +72,6 @@ public class ElevatorMoveCalculatorService {
                 .min(Comparator.comparing(e ->
                     Math.abs(e.getCurrentFloor() - pendingFloor)
                 ));
-        System.out.println("Free");
         return returnNullOrElevatorHelper(optionalElevator, pendingFloor, Flag.ADD_CURRENT_MOVE);
     }
 
@@ -99,8 +93,6 @@ public class ElevatorMoveCalculatorService {
         if (optionalElevator.isPresent()) {
             Elevator elevator = optionalElevator.get();
             int difference = Math.abs(elevator.getCurrentFloor() - pendingFloor);
-            System.out.println(elevator);
-            System.out.println(difference);
             return new ElevatorMoveCalculatorHelper(difference, elevator, 0, flag);
         }
         return null;

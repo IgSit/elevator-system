@@ -23,110 +23,113 @@ public class ElevatorMoveCalculatorService {
 
     public ElevatorMoveCalculatorHelper findOptimalElevator(int pendingFloor) {
         List<Elevator> elevators = elevatorService.getElevators();
-        int resultDifference = Integer.MAX_VALUE;
-        Elevator elevator = null;
-        int moveIndex = 0;
-        AddMoveHandler addMoveHandler = null;
 
-        ElevatorMoveCalculatorHelper result = new ElevatorMoveCalculatorHelper(
-                resultDifference,
-                elevator,
-                moveIndex,
-                addMoveHandler);
+        ElevatorMoveCalculatorHelper result = getBiggestDifferenceHelper();
 
-        ElevatorMoveCalculatorHelper freeOrPassingByHelper = findFreeOrPassingByElevator(elevators, pendingFloor);
-        if (freeOrPassingByHelper != null) result = freeOrPassingByHelper;
+        ElevatorMoveCalculatorHelper freeHelper = findClosestFreeElevator(elevators, pendingFloor);
+
+        if (freeHelper.difference() < result.difference()) result = freeHelper;
+
+        ElevatorMoveCalculatorHelper passingByHelper = findPassingByElevator(elevators, pendingFloor);
+
+        if(passingByHelper.difference() < result.difference()) result = passingByHelper;
 
         ElevatorMoveCalculatorHelper plannedHelper = findBestPlannedElevator(elevators, pendingFloor);
-        if (plannedHelper != null && plannedHelper.difference() < result.difference()) result = plannedHelper;
+
+        if (plannedHelper.difference() < result.difference()) result = plannedHelper;
 
         return result;
     }
 
-    private ElevatorMoveCalculatorHelper findFreeOrPassingByElevator(List<Elevator> elevators, int pendingFloor) {
-        ElevatorMoveCalculatorHelper freeElevator = findClosestFreeElevator(elevators, pendingFloor);
-
-        ElevatorMoveCalculatorHelper passingByElevator = findPassingByElevator(elevators, pendingFloor);
-
-        if (freeElevator != null && passingByElevator != null) {
-            if (freeElevator.difference() < passingByElevator.difference()) return freeElevator;
-            return passingByElevator;
-        }
-        if (freeElevator != null) {
-            return freeElevator;
-        }
-        return passingByElevator;
-    }
-
     private ElevatorMoveCalculatorHelper findBestPlannedElevator(List<Elevator> elevators, int pendingFloor) {
-        ElevatorMoveCalculatorHelper result = findInPlannedMoves(elevators.get(0), pendingFloor);
+        ElevatorMoveCalculatorHelper result = getBiggestDifferenceHelper();
 
         for (Elevator elevator : elevators) {
+            if (elevator.isFree()) continue;
             ElevatorMoveCalculatorHelper helper = findInPlannedMoves(elevator, pendingFloor);
-
-            if (helper != null && result != null && helper.difference() < result.difference()) {
+            System.out.println(helper.difference());
+            if (helper.difference() < result.difference())
                 result = helper;
-            }
         }
         return result;
     }
 
     private ElevatorMoveCalculatorHelper findInPlannedMoves(Elevator elevator, int pendingFloor) {
-        if (elevator.getPlannedMoves().isEmpty()) return null;
+        if (elevator.getPlannedMoves().isEmpty()) {
+            int difference = Math.abs(elevator.getCurrentMove() - pendingFloor)
+                             + Math.abs(elevator.getCurrentMove() - elevator.getCurrentFloor());
+            return new ElevatorMoveCalculatorHelper(
+                    difference,
+                    elevator,
+                    0,
+                    AddMoveHandler.ADD_TO_PLANNED_MOVES
+            );
+        }
 
         int movesSize = elevator.getPlannedMoves().size();
 
         int differenceAsFirstMove = calculateMoveImpact(
                 elevator.getCurrentFloor(),
                 elevator.getCurrentMove(),
-                pendingFloor) * calculateFutureMovesImpact(movesSize);
+                pendingFloor) * calculateFutureMovesImpact(movesSize
+        );
 
         ElevatorMoveCalculatorHelper result = new ElevatorMoveCalculatorHelper(
                 differenceAsFirstMove,
                 elevator,
                 0,
-                AddMoveHandler.ADD_TO_PLANNED_MOVES);
+                AddMoveHandler.ADD_TO_PLANNED_MOVES
+        );
 
         List<ElevatorMove> moves = elevator.getPlannedMoves();
 
         for (int i = 1; i < moves.size(); i++) {
-            int moveDifference = calculateMoveImpact(moves.get(i - 1).getFloor(), moves.get(i).getFloor(), pendingFloor);
+            int moveDifference = calculateMoveImpact(
+                    moves.get(i - 1).getFloor(),
+                    moves.get(i).getFloor(),
+                    pendingFloor
+            );
+
             int futureMovesSize = movesSize - i;
 
             moveDifference += moveDifference * calculateFutureMovesImpact(futureMovesSize);
 
             if (moveDifference < result.difference())
-
                 result = new ElevatorMoveCalculatorHelper(
                         moveDifference,
                         elevator,
                         i,
-                        AddMoveHandler.ADD_TO_PLANNED_MOVES);
+                        AddMoveHandler.ADD_TO_PLANNED_MOVES
+                );
         }
         return result;
     }
 
     private ElevatorMoveCalculatorHelper findClosestFreeElevator(List<Elevator> elevators, int pendingFloor) {
+        ElevatorMoveCalculatorHelper result = getBiggestDifferenceHelper();
+
         Optional<Elevator> optionalElevator = elevators
                 .stream()
                 .filter(Elevator::isFree)
                 .min(Comparator.comparing(e ->
                         Math.abs(e.getCurrentFloor() - pendingFloor)
                 ));
-        return returnNullOrElevatorHelper(optionalElevator, pendingFloor, AddMoveHandler.ADD_CURRENT_MOVE);
+
+        if (optionalElevator.isPresent()) {
+            Elevator elevator = optionalElevator.get();
+
+            result = new ElevatorMoveCalculatorHelper(
+                    Math.abs(elevator.getCurrentFloor() - pendingFloor),
+                    elevator,
+                    0,
+                    AddMoveHandler.ADD_CURRENT_MOVE
+            );
+        }
+        return result;
     }
 
     private ElevatorMoveCalculatorHelper findPassingByElevator(List<Elevator> elevators, int pendingFloor) {
-        int resultDifference = Integer.MAX_VALUE;
-        Elevator resultElevator = null;
-        int moveIndex = 0;
-        AddMoveHandler addMoveHandler = null;
-
-        ElevatorMoveCalculatorHelper result = new ElevatorMoveCalculatorHelper(
-                resultDifference,
-                resultElevator,
-                moveIndex,
-                addMoveHandler);
+        ElevatorMoveCalculatorHelper result = getBiggestDifferenceHelper();
 
         for (Elevator elevator : elevators) {
             if (elevator.isBusy() && elevator.passesBy(pendingFloor)) {
@@ -136,31 +139,16 @@ public class ElevatorMoveCalculatorService {
                         elevator.getCurrentMove(),
                         pendingFloor) * calculateFutureMovesImpact(elevator.getPlannedMoves().size());
 
-                if (currentChange < result.difference()) {
+                if (currentChange < result.difference())
                     result = new ElevatorMoveCalculatorHelper(
                             currentChange,
                             elevator,
                             0,
-                            AddMoveHandler.CHANGE_CURRENT_MOVE);
-                }
+                            AddMoveHandler.CHANGE_CURRENT_MOVE
+                    );
             }
         }
         return result;
-    }
-
-    private ElevatorMoveCalculatorHelper returnNullOrElevatorHelper(
-            Optional<Elevator> optionalElevator,
-            int pendingFloor,
-            AddMoveHandler addMoveHandler) {
-
-        if (optionalElevator.isPresent()) {
-            Elevator elevator = optionalElevator.get();
-
-            int difference = Math.abs(elevator.getCurrentFloor() - pendingFloor);
-
-            return new ElevatorMoveCalculatorHelper(difference, elevator, 0, addMoveHandler);
-        }
-        return null;
     }
 
     private int calculateMoveImpact(int currentFloor, int currentMove, int pendingFloor) {
@@ -169,5 +157,19 @@ public class ElevatorMoveCalculatorService {
 
     private int calculateFutureMovesImpact(int size) {
         return (size + 1) * (size + 2) / 2;
+    }
+
+    private ElevatorMoveCalculatorHelper getBiggestDifferenceHelper() {
+        int resultDifference = Integer.MAX_VALUE;
+        Elevator resultElevator = null;
+        int moveIndex = 0;
+        AddMoveHandler addMoveHandler = null;
+
+        return new ElevatorMoveCalculatorHelper(
+                resultDifference,
+                resultElevator,
+                moveIndex,
+                addMoveHandler
+        );
     }
 }

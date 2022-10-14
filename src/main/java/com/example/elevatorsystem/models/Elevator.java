@@ -49,7 +49,7 @@ public class Elevator {
     }
 
     public boolean isBusy() {
-        return currentMove != -1;
+        return currentMove != null;
     }
 
     public boolean isFree() {
@@ -105,10 +105,6 @@ public class Elevator {
         return isBusy() && currentMove > currentFloor;
     }
 
-    private boolean isGoingDown() {
-        return isBusy() && currentMove < currentFloor;
-    }
-
     private boolean shouldFinishCurrentMove() {
         if (isFree()) return false;
         return currentFloor == currentMove;
@@ -116,8 +112,6 @@ public class Elevator {
 
     private void finishCurrentMove(ElevatorMoveManagerService moveManagerService) {
         if (plannedMoves.isEmpty()) currentMove = null;
-        else {
-            currentMove = moveManagerService.popFirstMove(this.id).getFloor();
-        }
+        else currentMove = moveManagerService.popFirstMove(this.id).getFloor();
     }
 }

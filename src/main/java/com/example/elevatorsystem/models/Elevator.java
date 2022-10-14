@@ -21,13 +21,13 @@ public class Elevator {
     )
     private Long id;
     private int currentFloor;
-    private int currentMove;
+    private Integer currentMove;
     @OneToMany(mappedBy = "elevator")
     private List<ElevatorMove> plannedMoves;
 
     public Elevator() {
         currentFloor = 0;
-        currentMove = -1;
+        currentMove = null;
         plannedMoves = new ArrayList<>() {
         };
     }
@@ -56,21 +56,17 @@ public class Elevator {
         return !isBusy();
     }
 
-    public boolean hasSameDirection(int pendingFloor) throws RuntimeException {
+    public boolean passesBy(int pendingFloor) throws RuntimeException {
         if (isFree()) throw new RuntimeException("Elevator has no current move");
         return (currentFloor <= pendingFloor && pendingFloor <= currentMove) ||
                 (currentFloor >= pendingFloor && pendingFloor >= currentMove);
-    }
-
-    public boolean hasOppositeDirection(int pendingFloor) throws RuntimeException{
-        return !hasSameDirection(pendingFloor);
     }
 
     public Long getId() {
         return id;
     }
 
-    public int getCurrentFloor() {
+    public Integer getCurrentFloor() {
         return currentFloor;
     }
 
@@ -106,11 +102,11 @@ public class Elevator {
     }
 
     private boolean isGoingUp() {
-        return currentMove != -1 && currentMove > currentFloor;
+        return isBusy() && currentMove > currentFloor;
     }
 
     private boolean isGoingDown() {
-        return currentMove != -1 && currentMove < currentFloor;
+        return isBusy() && currentMove < currentFloor;
     }
 
     private boolean shouldFinishCurrentMove() {
@@ -119,7 +115,7 @@ public class Elevator {
     }
 
     private void finishCurrentMove(ElevatorMoveManagerService moveManagerService) {
-        if (plannedMoves.isEmpty()) currentMove = -1;
+        if (plannedMoves.isEmpty()) currentMove = null;
         else {
             currentMove = moveManagerService.popFirstMove(this.id).getFloor();
         }

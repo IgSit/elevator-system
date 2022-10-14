@@ -31,7 +31,7 @@ class ElevatorMoveCalculatorServiceTest {
     }
 
     @Test
-    void whenOneElevatorIsPassingByPendingFloorChoosesThatElevator() {
+    void findOptimalElevator_OnePassingBy_ChoosesPassingBy() {
         int pendingFloor = 2;
 
         Elevator passingElevator = new Elevator();
@@ -51,7 +51,7 @@ class ElevatorMoveCalculatorServiceTest {
     }
 
     @Test
-    void whenOneElevatorIsPassingByAndOthersAreFreeChoosesClosestFreeElevator() {
+    void findOptimalElevator_OnePassingBy_OtherFree_ChoosesClosestFree() {
         int pendingFloor = 2;
 
         Elevator passingElevator = new Elevator();
@@ -73,7 +73,7 @@ class ElevatorMoveCalculatorServiceTest {
     }
 
     @Test
-    void whenOneElevatorIsPassingByButIsOverloadedChoosesLessOverloadedElevator() {
+    void findOptimalElevator_OnePassingByOverloaded_OneNotPassingByLessOverloaded_ChoosesLessOverloaded() {
         int pendingFloor = 5;
 
         Elevator passingElevator = new Elevator();

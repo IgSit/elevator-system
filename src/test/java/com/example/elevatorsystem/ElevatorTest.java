@@ -92,21 +92,21 @@ class ElevatorTest {
     }
 
     @Test
-    void hasSameDirection_SameDirectionElevator_true() {
+    void passesBy_SameDirectionElevator_true() {
         int pendingFloor = 5;
 
         Elevator elevator = new Elevator();
         elevator.setCurrentMove(6);
 
-        assertTrue(elevator.hasSameDirection(pendingFloor));
+        assertTrue(elevator.passesBy(pendingFloor));
     }
 
     @Test
-    void hasOppositeDirection_FreeElevator_ThrowsException() {
+    void passesBy_FreeElevator_ThrowsException() {
         int pendingFloor = 3;
 
         Elevator elevator = new Elevator();
 
-        assertThrows(RuntimeException.class, () -> elevator.hasOppositeDirection(pendingFloor));
+        assertThrows(RuntimeException.class, () -> elevator.passesBy(pendingFloor));
     }
 }

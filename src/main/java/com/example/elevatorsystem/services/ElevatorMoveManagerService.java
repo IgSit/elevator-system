@@ -3,7 +3,7 @@ package com.example.elevatorsystem.services;
 import com.example.elevatorsystem.models.Elevator;
 import com.example.elevatorsystem.models.ElevatorMove;
 import com.example.elevatorsystem.models.ElevatorMoveCalculatorHelper;
-import com.example.elevatorsystem.models.Flag;
+import com.example.elevatorsystem.models.AddMoveHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,9 @@ public class ElevatorMoveManagerService {
     private final ElevatorMoveService moveService;
 
     @Autowired
-    ElevatorMoveManagerService(ElevatorMoveCalculatorService moveCalculatorService, ElevatorMoveService moveService) {
+    ElevatorMoveManagerService(
+            ElevatorMoveCalculatorService moveCalculatorService,
+            ElevatorMoveService moveService) {
         this.moveCalculatorService = moveCalculatorService;
         this.moveService = moveService;
     }
@@ -24,7 +26,10 @@ public class ElevatorMoveManagerService {
     @Transactional
     public void addNewElevatorMove(int pendingFloor) {
         ElevatorMoveCalculatorHelper helper = moveCalculatorService.findOptimalElevator(pendingFloor);
-        if (helper.flag() != Flag.ADD_TO_PLANNED_MOVES) addAsCurrentDestination(helper, pendingFloor, helper.flag());
+
+        if (helper.moveHandler() != AddMoveHandler.ADD_TO_PLANNED_MOVES) {
+            addAsCurrentDestination(helper, pendingFloor, helper.moveHandler());
+        }
         else {
             ElevatorMove move = new ElevatorMove(pendingFloor, helper.index(), helper.elevator());
             addToPlannedMoves(helper, move);
@@ -44,9 +49,13 @@ public class ElevatorMoveManagerService {
         moveService.updateFutureElevatorMoves(elevatorId, 1, -1);
     }
 
-    private void addAsCurrentDestination(ElevatorMoveCalculatorHelper helper, int pendingFloor, Flag flag) {
+    private void addAsCurrentDestination(
+            ElevatorMoveCalculatorHelper helper,
+            int pendingFloor,
+            AddMoveHandler addMoveHandler) {
+
         Elevator elevator = helper.elevator();
-        if (flag == Flag.CHANGE_CURRENT_MOVE) {
+        if (addMoveHandler == AddMoveHandler.CHANGE_CURRENT_MOVE) {
             ElevatorMove move = new ElevatorMove(elevator.getCurrentMove(), 0, helper.elevator());
             elevator.addMove(move, moveService);
         }

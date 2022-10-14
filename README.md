@@ -119,4 +119,4 @@ The complexity of algorithm is O(E*M) which is high but considering the case stu
 - there aren't that many elevators (in the task it is said up to 16)
 - there shouldn't be that many planned moves (limited by the number of building floors)
 
-We can assume with big confidence it's not going to run slow and cause problems in that nature.
+The algorithm besides being linear has small factors included in its complexity.
